@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDo List</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container"> 
+        <header>
+            <h1>Task Manager</h1>
+            <p class="description">A simple and efficient way to manage your tasks and track your progress.</p>
+        </header>
+
+        <main>
+            <div id="current-tasks" class="page active">
+                <h2>Current Tasks</h2>
+                <div class="task-input">
+                    <input type="text" id="new-task" placeholder="Add a new task...">
+                    <select id="task-category">
+                        <option value="work">Work</option>
+                        <option value="personal">Personal</option>
+                        <option value="shopping">Shopping</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <button onclick="addTask()">Add Task</button>
+                </div>
+                <div id="tasks-list" class="tasks-container"></div>
+            </div>
+
+            <div id="completed-tasks" class="page">
+                <h2>Completed Tasks</h2>
+                <div id="completed-tasks-list" class="tasks-container"></div>
+            </div>
+
+            <div id="task-history" class="page">
+                <div class="history-header">
+                    <h2>Task History</h2>
+                    <button class="clear-history-btn" onclick="clearHistory()">Clear History</button>
+                </div>
+                <div class="favorite-category">
+                    <h3>Your Favorite Category</h3>
+                    <p id="favorite-category-display">No tasks completed yet</p>
+                </div>
+                <div id="history-list" class="tasks-container"></div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <button class="nav-btn active" onclick="changePage('current-tasks')">
+                <span class="icon">📝</span>
+                <span>Current</span>
+            </button>
+            <button class="nav-btn" onclick="changePage('completed-tasks')">
+                <span class="icon">✅</span>
+                <span>Completed</span>
+            </button>
+            <button class="nav-btn" onclick="changePage('task-history')">
+                <span class="icon">📊</span>
+                <span>History</span>
+            </button>
+        </nav>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 
