@@ -3,14 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToDo List</title>
+    <title>Task Manager</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container"> 
+    <div class="container">
         <header>
             <h1>Task Manager</h1>
             <p class="description">A simple and efficient way to manage your tasks and track your progress.</p>
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Search tasks...">
+                <select id="filter-category">
+                    <option value="all">All Categories</option>
+                    <option value="work">Work</option>
+                    <option value="personal">Personal</option>
+                    <option value="shopping">Shopping</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="view-filters">
+                <button class="filter-btn active" data-view="all">All Tasks</button>
+                <button class="filter-btn" data-view="active">Active</button>
+            </div>
         </header>
 
         <main>
@@ -24,7 +38,21 @@
                         <option value="shopping">Shopping</option>
                         <option value="other">Other</option>
                     </select>
-                    <button onclick="addTask()">Add Task</button>
+                    <button onclick="addTask()" class="add-btn">
+                        <span class="btn-text">Add Task</span>
+                        <span class="btn-icon">+</span>
+                    </button>
+                </div>
+                <div class="task-stats">
+                    <div class="stat-item">
+                        <span id="total-tasks">Total: 0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span id="active-tasks">Active: 0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span id="completed-count">Completed: 0</span>
+                    </div>
                 </div>
                 <div id="tasks-list" class="tasks-container"></div>
             </div>

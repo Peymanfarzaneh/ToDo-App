@@ -1,7 +1,26 @@
-// Initialize tasks from localStorage or create empty arrays
+// DOM Elements cache
+const DOM = {
+    newTask: document.getElementById('new-task'),
+    taskCategory: document.getElementById('task-category'),
+    tasksList: document.getElementById('tasks-list'),
+    completedTasksList: document.getElementById('completed-tasks-list'),
+    historyList: document.getElementById('history-list'),
+    favoriteCategory: document.getElementById('favorite-category-display'),
+    searchInput: document.getElementById('search-input'),
+    filterCategory: document.getElementById('filter-category'),
+    totalTasks: document.getElementById('total-tasks'),
+    activeTasks: document.getElementById('active-tasks'),
+    completedCount: document.getElementById('completed-count'),
+    viewFilters: document.querySelectorAll('.filter-btn')
+};
+
+// State management
 let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 let completedTasks = JSON.parse(localStorage.getItem('completedTasks')) || [];
 let taskHistory = JSON.parse(localStorage.getItem('taskHistory')) || [];
+let currentView = 'all';
+let searchTerm = '';
+let categoryFilter = 'all';
 
 // Function to save tasks to localStorage
 function saveTasks() {
@@ -9,14 +28,78 @@ function saveTasks() {
     localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
     localStorage.setItem('taskHistory', JSON.stringify(taskHistory));
     updateFavoriteCategory();
+    updateTaskStats();
+}
+
+// Function to update task statistics
+function updateTaskStats() {
+    const total = tasks.length + completedTasks.length;
+    const active = tasks.length;
+    const completed = completedTasks.length;
+
+    DOM.totalTasks.textContent = `Total: ${total}`;
+    DOM.activeTasks.textContent = `Active: ${active}`;
+    DOM.completedCount.textContent = `Completed: ${completed}`;
+}
+
+// Function to filter and search tasks
+function filterAndSearchTasks() {
+    let filteredTasks = [];
+    
+    // First, combine tasks based on view filter
+    switch(currentView) {
+        case 'active':
+            filteredTasks = [...tasks];
+            break;
+        default:
+            filteredTasks = [...tasks];
+    }
+
+    // Then apply category filter
+    if (categoryFilter !== 'all') {
+        filteredTasks = filteredTasks.filter(task => task.category === categoryFilter);
+    }
+
+    // Finally, apply search term
+    if (searchTerm) {
+        const term = searchTerm.toLowerCase();
+        filteredTasks = filteredTasks.filter(task => 
+            task.text.toLowerCase().includes(term) || 
+            task.category.toLowerCase().includes(term)
+        );
+    }
+
+    return filteredTasks;
+}
+
+// Function to render filtered tasks
+function renderFilteredTasks() {
+    const filteredTasks = filterAndSearchTasks();
+    DOM.tasksList.innerHTML = '';
+    const fragment = document.createDocumentFragment();
+
+    filteredTasks.forEach(task => {
+        const isCompleted = completedTasks.some(t => t.id === task.id);
+        const taskElement = createTaskElement(task, isCompleted ? 'completed' : 'current');
+        fragment.appendChild(taskElement);
+    });
+
+    DOM.tasksList.appendChild(fragment);
+}
+
+// Function to update view filters
+function updateViewFilters(view) {
+    currentView = view;
+    DOM.viewFilters.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === view);
+    });
+    renderFilteredTasks();
 }
 
 // Function to add a new task
 function addTask() {
-    const taskInput = document.getElementById('new-task');
-    const categorySelect = document.getElementById('task-category');
-    const taskText = taskInput.value.trim();
-    const category = categorySelect.value;
+    const taskText = DOM.newTask.value.trim();
+    const category = DOM.taskCategory.value;
 
     if (taskText) {
         const task = {
@@ -28,8 +111,8 @@ function addTask() {
 
         tasks.push(task);
         saveTasks();
-        renderTasks();
-        taskInput.value = '';
+        renderFilteredTasks();
+        DOM.newTask.value = '';
     }
 }
 
@@ -47,7 +130,7 @@ function completeTask(taskId) {
         tasks.splice(taskIndex, 1);
         
         saveTasks();
-        renderTasks();
+        renderFilteredTasks();
         renderCompletedTasks();
         renderTaskHistory();
     }
@@ -62,54 +145,49 @@ function deleteTask(taskId, taskType) {
     }
     
     saveTasks();
-    renderTasks();
+    renderFilteredTasks();
     renderCompletedTasks();
-}
-
-// Function to render current tasks
-function renderTasks() {
-    const tasksList = document.getElementById('tasks-list');
-    tasksList.innerHTML = '';
-
-    tasks.forEach(task => {
-        const taskElement = createTaskElement(task, 'current');
-        tasksList.appendChild(taskElement);
-    });
 }
 
 // Function to render completed tasks
 function renderCompletedTasks() {
-    const completedTasksList = document.getElementById('completed-tasks-list');
-    completedTasksList.innerHTML = '';
+    DOM.completedTasksList.innerHTML = '';
+    const fragment = document.createDocumentFragment();
 
     completedTasks.forEach(task => {
         const taskElement = createTaskElement(task, 'completed');
-        completedTasksList.appendChild(taskElement);
+        fragment.appendChild(taskElement);
     });
+
+    DOM.completedTasksList.appendChild(fragment);
 }
 
 // Function to render task history
 function renderTaskHistory() {
-    const historyList = document.getElementById('history-list');
-    historyList.innerHTML = '';
+    DOM.historyList.innerHTML = '';
+    const fragment = document.createDocumentFragment();
 
     taskHistory.slice().reverse().forEach(task => {
         const taskElement = document.createElement('div');
         taskElement.className = 'task-item';
+        taskElement.dataset.category = task.category;
         taskElement.innerHTML = `
             <div class="task-content">
                 <div>${task.text}</div>
                 <div class="task-category">${task.category} - Completed: ${new Date(task.completedDate).toLocaleDateString()}</div>
             </div>
         `;
-        historyList.appendChild(taskElement);
+        fragment.appendChild(taskElement);
     });
+
+    DOM.historyList.appendChild(fragment);
 }
 
 // Function to create task element
 function createTaskElement(task, type) {
     const taskElement = document.createElement('div');
     taskElement.className = 'task-item';
+    taskElement.dataset.category = task.category;
     
     const taskContent = `
         <div class="task-content">
@@ -152,23 +230,18 @@ function updateFavoriteCategory() {
         }
     }
 
-    document.getElementById('favorite-category-display').textContent = favoriteCategory;
+    DOM.favoriteCategory.textContent = favoriteCategory;
 }
 
 // Function to change pages
 function changePage(pageId) {
-    // Hide all pages
-    document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-    });
+    const pages = document.querySelectorAll('.page');
+    const navButtons = document.querySelectorAll('.nav-btn');
     
-    // Show selected page
+    pages.forEach(page => page.classList.remove('active'));
+    navButtons.forEach(btn => btn.classList.remove('active'));
+    
     document.getElementById(pageId).classList.add('active');
-    
-    // Update navigation buttons
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
     document.querySelector(`[onclick="changePage('${pageId}')"]`).classList.add('active');
 }
 
@@ -183,27 +256,44 @@ function clearHistory() {
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
-    // Add event listeners for task actions
+    // Event delegation for task actions
     document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('complete-btn')) {
-            const taskId = parseInt(e.target.dataset.taskId);
+        const target = e.target;
+        if (target.classList.contains('complete-btn')) {
+            const taskId = parseInt(target.dataset.taskId);
             completeTask(taskId);
-        } else if (e.target.classList.contains('delete-btn')) {
-            const taskId = parseInt(e.target.dataset.taskId);
-            const taskType = e.target.dataset.type;
+        } else if (target.classList.contains('delete-btn')) {
+            const taskId = parseInt(target.dataset.taskId);
+            const taskType = target.dataset.type;
             deleteTask(taskId, taskType);
+        } else if (target.classList.contains('filter-btn')) {
+            updateViewFilters(target.dataset.view);
         }
     });
 
-    renderTasks();
-    renderCompletedTasks();
-    renderTaskHistory();
-    updateFavoriteCategory();
+    // Search input handler
+    DOM.searchInput.addEventListener('input', (e) => {
+        searchTerm = e.target.value;
+        renderFilteredTasks();
+    });
+
+    // Category filter handler
+    DOM.filterCategory.addEventListener('change', (e) => {
+        categoryFilter = e.target.value;
+        renderFilteredTasks();
+    });
 
     // Add enter key support for task input
-    document.getElementById('new-task').addEventListener('keypress', (e) => {
+    DOM.newTask.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             addTask();
         }
     });
+
+    // Initial render
+    renderFilteredTasks();
+    renderCompletedTasks();
+    renderTaskHistory();
+    updateFavoriteCategory();
+    updateTaskStats();
 }); 

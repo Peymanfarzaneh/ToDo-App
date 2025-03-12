@@ -234,6 +234,130 @@ button[onclick="addTask()"]:hover {
     background-color: #ff5252;
 }
 
+.search-bar {
+    margin: 20px 0;
+    display: flex;
+    gap: 10px;
+    padding: 0 20px;
+}
+
+.search-bar input {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.search-bar input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.search-bar select {
+    min-width: 150px;
+}
+
+.view-filters {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    background: transparent;
+    border: 2px solid #4a90e2;
+    color: #4a90e2;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+    background: #4a90e2;
+    color: white;
+}
+
+.filter-btn.active {
+    background: #4a90e2;
+    color: white;
+}
+
+.task-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 10px 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.stat-item span {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.add-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.add-btn:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+}
+
+.add-btn:active {
+    transform: translateY(0);
+}
+
+.btn-icon {
+    font-size: 1.2em;
+    transition: transform 0.3s ease;
+}
+
+.add-btn:hover .btn-icon {
+    transform: rotate(90deg);
+}
+
+/* Update task item styles to show category colors */
+.task-item[data-category="work"] {
+    border-left-color: #4a90e2;
+}
+
+.task-item[data-category="personal"] {
+    border-left-color: #9c27b0;
+}
+
+.task-item[data-category="shopping"] {
+    border-left-color: #4CAF50;
+}
+
+.task-item[data-category="other"] {
+    border-left-color: #ff9800;
+}
+
 @media (max-width: 600px) {
     .task-input {
         flex-direction: column;
@@ -252,5 +376,23 @@ button[onclick="addTask()"]:hover {
     .task-item .task-actions {
         width: 100%;
         justify-content: center;
+    }
+
+    .search-bar {
+        flex-direction: column;
+        padding: 0 10px;
+    }
+
+    .view-filters {
+        flex-wrap: wrap;
+    }
+
+    .task-stats {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .stat-item {
+        width: 100%;
     }
 } 
